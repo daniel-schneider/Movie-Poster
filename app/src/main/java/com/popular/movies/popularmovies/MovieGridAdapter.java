@@ -1,5 +1,6 @@
 package com.popular.movies.popularmovies;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,11 +11,16 @@ import android.view.ViewGroup;
  * Created by danielschneider on 4/28/18.
  */
 
-public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.ViewHolder>  {
+public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.ViewHolder> {
 
-    private String[] mMovieData;
+    private String[] mMovieData = new String[0];
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
+
+    MovieGridAdapter(Context context, String[] data) {
+        this.mInflater = LayoutInflater.from(context);
+        this.mMovieData = data;
+    }
 
 
     @NonNull
