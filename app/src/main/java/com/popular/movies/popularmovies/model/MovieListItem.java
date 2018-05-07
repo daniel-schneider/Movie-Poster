@@ -6,6 +6,7 @@ package com.popular.movies.popularmovies.model;
 
 public class MovieListItem {
 
+    private static String BASE_IMAGE_URL = "http://image.tmdb.org/t/p/w342/";
     private String uri;
     private String imageUrl;
     private String title;
@@ -25,7 +26,7 @@ public class MovieListItem {
     }
 
     public String getImageUrl() {
-        return imageUrl;
+        return BASE_IMAGE_URL + imageUrl;
     }
 
     public void setImageUrl(String imageUrl) {

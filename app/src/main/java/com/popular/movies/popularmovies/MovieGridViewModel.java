@@ -12,13 +12,17 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+
 /**
  * Created by danielschneider on 5/6/18.
  */
 
 public class MovieGridViewModel extends ViewModel {
 
-    public List<MovieListItem> getMovieListData() {
+    private List<MovieListItem> getMovieListData() {
         List<MovieListItem> movieList = new ArrayList<>();
 
         String movieJsonString = NetworkUtilities.getPopularMovies();
@@ -42,5 +46,11 @@ public class MovieGridViewModel extends ViewModel {
         }
 
         return movieList;
+    }
+
+    public Single<List<MovieListItem>> getMovielist() {
+        return Single.fromCallable(() -> getMovieListData())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 }
