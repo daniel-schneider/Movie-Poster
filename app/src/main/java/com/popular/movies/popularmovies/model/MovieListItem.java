@@ -100,7 +100,7 @@ public class MovieListItem implements Parcelable {
     }
 
     public void setVoteCount(int count) {
-        this.voteCount = voteCount;
+        this.voteCount = count;
     }
 
     public double getVoteAverage() {
@@ -116,7 +116,7 @@ public class MovieListItem implements Parcelable {
     }
 
     public void setVotePopularity(double popularityNumber) {
-        this.popularity = popularity;
+        this.popularity = popularityNumber;
     }
 
     public String getId() {
