@@ -55,8 +55,9 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
 
     @Override
     public void onItemClick(View view, int position) {
-        MovieDetailActivity movieDetailActivity = new MovieDetailActivity(mMovieGridAdapter.getMovieListItemForPosition(position));
-        Intent intent = new Intent(getActivity(), movieDetailActivity.getClass());
+//        MovieDetailActivity movieDetailActivity = new MovieDetailActivity(mMovieGridAdapter.getMovieListItemForPosition(position));
+        Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
+        intent.putExtra(MovieDetailActivity.EXTRA_MOVIE, mMovieGridAdapter.getMovieListItemForPosition(position));
         startActivity(intent);
     }
 }

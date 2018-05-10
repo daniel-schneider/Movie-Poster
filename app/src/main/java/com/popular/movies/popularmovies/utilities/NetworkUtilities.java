@@ -21,7 +21,7 @@ public class NetworkUtilities {
     private static final String BASE_URL = "https://api.themoviedb.org/3/movie";
     private static final String POPULAR_PATH = "/popular?api_key=";
 //    private static final String HIGHEST_RATED = "/popular?api_key=";
-    private static final String API_KEY = "";
+    private static final String API_KEY = "d925d6013399b948dce8b081e6badaf3";
     private static final String LANGUAGE_PAGE = "&language=en-US&page=1";
 
 
