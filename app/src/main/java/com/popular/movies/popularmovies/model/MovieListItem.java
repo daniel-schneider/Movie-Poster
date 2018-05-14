@@ -20,6 +20,7 @@ public class MovieListItem implements Parcelable {
     private String id;
     private boolean hasVideo;
     private String overView;
+    private String releaseDate;
 
     public MovieListItem() {
 
@@ -35,6 +36,7 @@ public class MovieListItem implements Parcelable {
         id = in.readString();
         hasVideo = in.readByte() != 0;
         overView = in.readString();
+        releaseDate = in.readString();
     }
 
     @Override
@@ -48,6 +50,7 @@ public class MovieListItem implements Parcelable {
         dest.writeString(id);
         dest.writeByte((byte) (hasVideo ? 1 : 0));
         dest.writeString(overView);
+        dest.writeString(releaseDate);
     }
 
     @Override
@@ -125,5 +128,21 @@ public class MovieListItem implements Parcelable {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public void setOverview(String overview) {
+        this.overView = overview;
+    }
+
+    public String getOverview() {
+        return overView;
+    }
+
+    public void setReleaseDate(String releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
+    public String getReleaseDate() {
+        return releaseDate;
     }
 }

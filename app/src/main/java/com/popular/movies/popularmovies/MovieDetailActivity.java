@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,6 +18,8 @@ import com.popular.movies.popularmovies.utilities.ImageLoader;
 public class MovieDetailActivity extends Activity {
 
     public static final String EXTRA_MOVIE = "movie";
+    public static final String EXTRA_MOVIE_BUNDLE_ITEM = "movieItem_bundle";
+
 
 
     private MovieListItem mMovieListItem;
@@ -41,9 +44,17 @@ public class MovieDetailActivity extends Activity {
         }
 
         Bundle data = getIntent().getExtras();
-        MovieListItem movieListItem = (MovieListItem) data.getParcelable(EXTRA_MOVIE);
 
-        populateUi(movieListItem);
+        if(savedInstanceState != null) {
+            if(savedInstanceState.containsKey(EXTRA_MOVIE_BUNDLE_ITEM)) {
+                mMovieListItem = (MovieListItem) savedInstanceState.getParcelable(EXTRA_MOVIE_BUNDLE_ITEM);
+            }
+        } else {
+            mMovieListItem = (MovieListItem) data.getParcelable(EXTRA_MOVIE);
+        }
+
+
+        populateUi(mMovieListItem);
     }
 
     private void populateUi(MovieListItem movieListItem) {
@@ -51,16 +62,27 @@ public class MovieDetailActivity extends Activity {
         titleTv.setText(movieListItem.getTitle());
         ImageView posterIv = findViewById(R.id.detail_movie_poster);
         ImageLoader.loadImage(this, movieListItem.getDetailImageUrl(), posterIv);
-        TextView yearTv = findViewById(R.id.year_tv);
+        TextView yearTv = findViewById(R.id.date_tv);
+        yearTv.setText(movieListItem.getReleaseDate());
         TextView lengthTv = findViewById(R.id.length_tv);
-        TextView ratingTv = findViewById(R.id.rating_tv);
-        Double voteAverage = movieListItem.getVoteAverage();
-        ratingTv.setText(voteAverage.toString());
-
+        RatingBar ratingBar = findViewById(R.id.rating_bar);
+        double voteAverage = movieListItem.getVoteAverage();
+        float va = (float) voteAverage;
+        ratingBar.setRating(va);
+        TextView descriptionText = findViewById(R.id.movie_description_tv);
+        descriptionText.setText(movieListItem.getOverview());
     }
 
     private void closeOnError() {
         finish();
         Toast.makeText(this, R.string.error_message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable(EXTRA_MOVIE_BUNDLE_ITEM, mMovieListItem);
+
     }
 }

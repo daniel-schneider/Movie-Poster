@@ -20,5 +20,4 @@
         android:visibility="gone"
         android:id="@+id/main_progress_bar"/>
 
-</RelativeLayout
-    >
+</RelativeLayout>

@@ -39,6 +39,8 @@ public class MovieGridViewModel extends ViewModel {
                 movieListItem.setVoteCount(movieObject.getInt("vote_count"));
                 movieListItem.setVoteAverage(movieObject.getDouble("vote_average"));
                 movieListItem.setVotePopularity(movieObject.getDouble("popularity"));
+                movieListItem.setOverview(movieObject.getString("overview"));
+                movieListItem.setReleaseDate(movieObject.getString("release_date"));
                 movieList.add(movieListItem);
             }
         } catch (JSONException e) {
