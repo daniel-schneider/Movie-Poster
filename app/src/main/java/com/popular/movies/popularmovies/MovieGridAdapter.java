@@ -97,4 +97,12 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.View
     public interface ItemClickListener {
         void onItemClick(View view, int position);
     }
+
+    public void clearAllMovieData() {
+        mMovieList.clear();
+    }
+
+    public void loadHighestRatedMovies() {
+//        TODO finish this method
+    }
 }

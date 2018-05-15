@@ -3,7 +3,6 @@ package com.popular.movies.popularmovies;
 import android.arch.lifecycle.ViewModel;
 
 import com.popular.movies.popularmovies.model.MovieListItem;
-import com.popular.movies.popularmovies.utilities.NetworkUtilities;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,13 +21,11 @@ import io.reactivex.schedulers.Schedulers;
 
 public class MovieGridViewModel extends ViewModel {
 
-    private List<MovieListItem> getMovieListData() {
+    private List<MovieListItem> getMovieListData(String movieString) {
         List<MovieListItem> movieList = new ArrayList<>();
 
-        String movieJsonString = NetworkUtilities.getPopularMovies();
-
         try {
-            JSONObject movieJson = new JSONObject(movieJsonString);
+            JSONObject movieJson = new JSONObject(movieString);
             JSONArray resultsArray = movieJson.getJSONArray("results");
             for(int i = 0; i < resultsArray.length(); i++) {
                 MovieListItem movieListItem = new MovieListItem();
@@ -50,8 +47,8 @@ public class MovieGridViewModel extends ViewModel {
         return movieList;
     }
 
-    public Single<List<MovieListItem>> getMovielist() {
-        return Single.fromCallable(() -> getMovieListData())
+    public Single<List<MovieListItem>> getMovielist(String movieJson) {
+        return Single.fromCallable(() -> getMovieListData(movieJson))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

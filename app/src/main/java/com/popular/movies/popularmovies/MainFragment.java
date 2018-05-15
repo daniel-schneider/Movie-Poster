@@ -10,8 +10,13 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.popular.movies.popularmovies.utilities.NetworkUtilities;
 
 import io.reactivex.disposables.CompositeDisposable;
 
@@ -34,6 +39,7 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
 
         if(savedInstanceState != null) {
             if(savedInstanceState.containsKey(LIST_STATE_KEY)) {
@@ -61,9 +67,11 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
 
 
         mRecyclerView = view.findViewById(R.id.movie_posters_recycler_view);
+        String movieJsonString = NetworkUtilities.getPopularMovies();
+
 
         MovieGridViewModel movieGridViewModel = ViewModelProviders.of(this).get(MovieGridViewModel.class);
-        mCompositDisposable.add(movieGridViewModel.getMovielist().subscribe((movieListItems -> {
+        mCompositDisposable.add(movieGridViewModel.getMovielist(movieJsonString).subscribe((movieListItems -> {
 
             mRecyclerView.setLayoutManager(mLayoutManager);
             mMovieGridAdapter = new MovieGridAdapter(getActivity(), movieListItems);
@@ -128,5 +136,30 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
             checkConfig();
             mLayoutManager.onRestoreInstanceState(mListState);
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.filter_type, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        MovieGridViewModel movieGridViewModel = ViewModelProviders.of(this).get(MovieGridViewModel.class);
+
+
+        if(id == R.id.action_popular) {
+
+        }
+
+        if (id == R.id.action_highest_rated) {
+            String movieJsonString = NetworkUtilities.getHighestRatedMovies();
+            mCompositDisposable.clear();
+            mCompositDisposable.add(movieGridViewModel.getMovielist(NetworkUtilities.getHighestRatedMovies()).subscribe());
+            mMovieGridAdapter.notifyDataSetChanged();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

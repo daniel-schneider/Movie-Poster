@@ -20,7 +20,7 @@ public class NetworkUtilities {
 
     private static final String BASE_URL = "https://api.themoviedb.org/3/movie";
     private static final String POPULAR_PATH = "/popular?api_key=";
-//    private static final String HIGHEST_RATED = "/popular?api_key=";
+    private static final String HIGHEST_RATED = "/top_rated?api_key=";
     private static final String API_KEY = "d925d6013399b948dce8b081e6badaf3";
     private static final String LANGUAGE_PAGE = "&language=en-US&page=1";
 
@@ -34,6 +34,21 @@ public class NetworkUtilities {
 
         try {
             movieData = new JsonTask().execute(BASE_URL + POPULAR_PATH + API_KEY + LANGUAGE_PAGE).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        return movieData;
+
+    }
+
+    public static String getHighestRatedMovies() {
+
+        String movieData = null;
+
+        try {
+            movieData = new JsonTask().execute(BASE_URL + HIGHEST_RATED + API_KEY + LANGUAGE_PAGE).get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
