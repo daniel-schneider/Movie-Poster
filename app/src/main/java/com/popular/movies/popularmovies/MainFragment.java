@@ -157,8 +157,13 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
         if (id == R.id.action_highest_rated) {
             String movieJsonString = NetworkUtilities.getHighestRatedMovies();
             mCompositDisposable.clear();
-            mCompositDisposable.add(movieGridViewModel.getMovielist(NetworkUtilities.getHighestRatedMovies()).subscribe());
-            mMovieGridAdapter.notifyDataSetChanged();
+            mCompositDisposable.add(movieGridViewModel.getMovielist(NetworkUtilities.getHighestRatedMovies()).subscribe(movieListItems ->
+            {
+                mMovieGridAdapter.clearAllMovieData();
+                mMovieGridAdapter.loadHighestRatedMovies(movieListItems);
+                mMovieGridAdapter.notifyDataSetChanged();
+
+            }));
         }
         return super.onOptionsItemSelected(item);
     }

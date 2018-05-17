@@ -102,7 +102,11 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.View
         mMovieList.clear();
     }
 
-    public void loadHighestRatedMovies() {
-//        TODO finish this method
+    public void loadHighestRatedMovies(List<MovieListItem> movieListItems) {
+
+        mMovieList.addAll(movieListItems);
+//        String rawMovies = NetworkUtilities.getHighestRatedMovies();
+//        MovieGridViewModel viewModel = new MovieGridViewModel();
+//        viewModel.getMovielist(rawMovies);
     }
 }
