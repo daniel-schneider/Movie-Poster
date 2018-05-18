@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.support.v7.widget.Toolbar;
 
 import com.popular.movies.popularmovies.model.MovieListItem;
 import com.popular.movies.popularmovies.utilities.ImageLoader;
@@ -19,6 +20,7 @@ public class MovieDetailActivity extends Activity {
 
     public static final String EXTRA_MOVIE = "movie";
     public static final String EXTRA_MOVIE_BUNDLE_ITEM = "movieItem_bundle";
+    Toolbar mToolbar;
 
 
 
@@ -37,7 +39,7 @@ public class MovieDetailActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.movie_detail);
-
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
         Intent intent = getIntent();
         if (intent == null) {
             closeOnError();
@@ -58,8 +60,9 @@ public class MovieDetailActivity extends Activity {
     }
 
     private void populateUi(MovieListItem movieListItem) {
-        TextView titleTv = findViewById(R.id.movie_title_tv);
-        titleTv.setText(movieListItem.getTitle());
+        mToolbar.setTitle(movieListItem.getTitle());
+//        TextView titleTv = findViewById(R.id.movie_title_tv);
+//        titleTv.setText(movieListItem.getTitle());
         ImageView posterIv = findViewById(R.id.detail_movie_poster);
         ImageLoader.loadImage(this, movieListItem.getDetailImageUrl(), posterIv);
         TextView yearTv = findViewById(R.id.date_tv);

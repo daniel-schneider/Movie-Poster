@@ -49,7 +49,7 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.View
         String title = mMovieList.get(position).getTitle();
         holder.title.setText(title);
 
-        ImageLoader.loadRoundedImageWithPlaceholder(mContext, mMovieList.get(position).getListImageUrl(), holder.MoviePosterImage, R.color.colorAccent);
+        ImageLoader.loadRoundedImage(mContext, mMovieList.get(position).getListImageUrl(), holder.MoviePosterImage);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

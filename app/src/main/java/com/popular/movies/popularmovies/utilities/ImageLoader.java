@@ -32,6 +32,10 @@ public class ImageLoader {
         loadRoundedImageWithPlaceholder(context, url, imageView, placeholder, 0);
     }
 
+    public static void loadRoundedImage(Context context, String url, ImageView imageView) {
+        Picasso.with(context).load(url).transform(new RoundedTransformation(20, 0)).into(imageView);
+    }
+
     public static void loadRoundedImageWithPlaceholder(Context context, String url, ImageView imageView, int placeholder) {
         loadRoundedImageWithPlaceholder(context, url, imageView, placeholder, 20);
     }

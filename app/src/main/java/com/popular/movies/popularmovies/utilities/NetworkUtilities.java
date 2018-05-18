@@ -2,6 +2,7 @@ package com.popular.movies.popularmovies.utilities;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ProgressBar;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,10 +24,11 @@ public class NetworkUtilities {
     private static final String HIGHEST_RATED = "/top_rated?api_key=";
     private static final String API_KEY = "d925d6013399b948dce8b081e6badaf3";
     private static final String LANGUAGE_PAGE = "&language=en-US&page=1";
+    ProgressBar bar;
 
-
-
-
+    public void setProgressBar(ProgressBar bar) {
+        this.bar = bar;
+    }
 
     public static String getPopularMovies() {
 
@@ -62,6 +64,7 @@ public class NetworkUtilities {
 
         protected void onPreExecute() {
             super.onPreExecute();
+
 
 //            pd = new ProgressDialog(MainActivity.this);
 //            pd.setMessage("Please wait");

@@ -9,7 +9,7 @@ import android.os.Parcelable;
 
 public class MovieListItem implements Parcelable {
 
-    private static String LIST_IMAGE_URL = "http://image.tmdb.org/t/p/w342/";
+    private static String LIST_IMAGE_URL = "http://image.tmdb.org/t/p/w780/";
     private static String DETAIL_IMAGE_URL = "http://image.tmdb.org/t/p/w500/";
     private String uri;
     private String imageUrl;
