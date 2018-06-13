@@ -1,8 +1,14 @@
 package com.popular.movies.popularmovies.utilities;
 
+import android.content.Context;
+import android.content.ContextWrapper;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ProgressBar;
+
+import com.popular.movies.popularmovies.BuildConfig;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,17 +23,22 @@ import java.util.concurrent.ExecutionException;
  * Created by danielschneider on 5/5/18.
  */
 
-public class NetworkUtilities {
+public class NetworkUtilities extends ContextWrapper {
 
     private static final String BASE_URL = "https://api.themoviedb.org/3/movie";
     private static final String POPULAR_PATH = "/popular?api_key=";
     private static final String HIGHEST_RATED = "/top_rated?api_key=";
-    private static final String API_KEY = "d925d6013399b948dce8b081e6badaf3";
     private static final String LANGUAGE_PAGE = "&language=en-US&page=1";
+    private static final String API_KEY = BuildConfig.API_KEY;
+
     ProgressBar bar;
 
     public void setProgressBar(ProgressBar bar) {
         this.bar = bar;
+    }
+
+    public NetworkUtilities (Context base) {
+        super(base);
     }
 
     public static String getPopularMovies() {
@@ -128,5 +139,17 @@ public class NetworkUtilities {
 //            txtJson.setText(result);
         }
     }
+
+    public static boolean isDeviceConnected(Context context) {
+        ConnectivityManager cm =
+                (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+        return isConnected;
+    }
+
 
 }

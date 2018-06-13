@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.popular.movies.popularmovies.utilities.NetworkUtilities;
 
@@ -78,14 +79,24 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
 
 
         MovieGridViewModel movieGridViewModel = ViewModelProviders.of(this).get(MovieGridViewModel.class);
-        mCompositDisposable.add(movieGridViewModel.getMovielist(movieJsonString).subscribe((movieListItems -> {
-            mProgressBar.setVisibility(View.GONE);
-            mRecyclerView.setLayoutManager(mLayoutManager);
-            mMovieGridAdapter = new MovieGridAdapter(getActivity(), movieListItems);
-            mMovieGridAdapter.setClickListener(this);
-            mRecyclerView.setAdapter(mMovieGridAdapter);
 
-        })));
+        if (NetworkUtilities.isDeviceConnected(getContext())) {
+            mCompositDisposable.add(movieGridViewModel.getMovielist(movieJsonString, getContext()).subscribe((movieListItems -> {
+                mProgressBar.setVisibility(View.GONE);
+                mRecyclerView.setLayoutManager(mLayoutManager);
+                mMovieGridAdapter = new MovieGridAdapter(getActivity(), movieListItems);
+                mMovieGridAdapter.setClickListener(this);
+                mRecyclerView.setAdapter(mMovieGridAdapter);
+
+            }), throwable -> {
+                Toast.makeText(getContext(), "no internet connection", Toast.LENGTH_LONG).show();
+
+            }));
+        } else {
+            Toast.makeText(getContext(), "no internet connection", Toast.LENGTH_LONG).show();
+        }
+
+
     }
 
     @Nullable
@@ -104,9 +115,12 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        mListState = mRecyclerView.getLayoutManager().onSaveInstanceState();
-        outState.putParcelable(LIST_STATE_KEY, mListState);
-        outState.putString(CURRENT_SORT_KEY, mCurrentSort);
+
+        if (mListState != null) {
+            mListState = mRecyclerView.getLayoutManager().onSaveInstanceState();
+            outState.putParcelable(LIST_STATE_KEY, mListState);
+            outState.putString(CURRENT_SORT_KEY, mCurrentSort);
+        }
     }
 
     @Override
@@ -136,8 +150,10 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
         super.onPause();
 
         Bundle bundle = new Bundle();
-        mListState = mRecyclerView.getLayoutManager().onSaveInstanceState();
-        bundle.putParcelable(LIST_STATE_KEY, mListState);
+        if (mListState != null) {
+            mListState = mRecyclerView.getLayoutManager().onSaveInstanceState();
+            bundle.putParcelable(LIST_STATE_KEY, mListState);
+        }
     }
 
     @Override
@@ -164,11 +180,22 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
         if(id == R.id.action_popular && !mCurrentSort.equals(SORT_POPULAR)) {
             mCurrentSort = SORT_POPULAR;
             mCompositDisposable.clear();
-            mCompositDisposable.add(movieGridViewModel.getMovielist(NetworkUtilities.getPopularMovies()).subscribe(movieListItems ->
+            mCompositDisposable.add(movieGridViewModel.getMovielist(NetworkUtilities.getPopularMovies(), getContext()).subscribe(movieListItems ->
             {
-                mMovieGridAdapter.clearAllMovieData();
-                mMovieGridAdapter.loadHighestRatedMovies(movieListItems);
-                mMovieGridAdapter.notifyDataSetChanged();
+                if (mMovieGridAdapter != null) {
+                    mMovieGridAdapter.clearAllMovieData();
+                    mMovieGridAdapter.loadHighestRatedMovies(movieListItems);
+                    mMovieGridAdapter.notifyDataSetChanged();
+                } else {
+                    mMovieGridAdapter = new MovieGridAdapter(getActivity(), movieListItems);
+                    mMovieGridAdapter.setClickListener(this);
+                    mRecyclerView.setAdapter(mMovieGridAdapter);
+                    mMovieGridAdapter.notifyDataSetChanged();
+
+                }
+
+            }, throwable -> {
+                Toast.makeText(getContext(), "no internet connection", Toast.LENGTH_LONG).show();
 
             }));
         }
@@ -176,11 +203,21 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
         if (id == R.id.action_highest_rated && !mCurrentSort.equals(SORT_TOP_RATED)) {
             mCurrentSort = SORT_TOP_RATED;
             mCompositDisposable.clear();
-            mCompositDisposable.add(movieGridViewModel.getMovielist(NetworkUtilities.getHighestRatedMovies()).subscribe(movieListItems ->
+            mCompositDisposable.add(movieGridViewModel.getMovielist(NetworkUtilities.getHighestRatedMovies(), getContext()).subscribe(movieListItems ->
             {
-                mMovieGridAdapter.clearAllMovieData();
-                mMovieGridAdapter.loadHighestRatedMovies(movieListItems);
-                mMovieGridAdapter.notifyDataSetChanged();
+                if (mMovieGridAdapter != null) {
+                    mMovieGridAdapter.clearAllMovieData();
+                    mMovieGridAdapter.loadHighestRatedMovies(movieListItems);
+                    mMovieGridAdapter.notifyDataSetChanged();
+                } else {
+                    mMovieGridAdapter = new MovieGridAdapter(getActivity(), movieListItems);
+                    mMovieGridAdapter.setClickListener(this);
+                    mRecyclerView.setAdapter(mMovieGridAdapter);
+                    mMovieGridAdapter.notifyDataSetChanged();
+                }
+
+            }, throwable -> {
+                Toast.makeText(getContext(), "no internet connection", Toast.LENGTH_LONG).show();
 
             }));
         }
@@ -196,7 +233,6 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
         } else {
             menu.findItem(R.id.action_popular).setChecked(true);
         }
-
     }
 
     @Override

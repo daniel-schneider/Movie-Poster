@@ -12,7 +12,6 @@ import retrofit2.http.GET;
 public interface MovieApiClient {
 
     String TAG = MovieApiClient.class.getSimpleName();
-    String language = "en-US";
 
     @GET("{api_key}/{language}/{page}/{region}")
     Single<Response<String>> downloadMovieData ();

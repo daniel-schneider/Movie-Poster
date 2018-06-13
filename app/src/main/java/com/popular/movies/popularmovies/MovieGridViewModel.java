@@ -1,6 +1,7 @@
 package com.popular.movies.popularmovies;
 
 import android.arch.lifecycle.ViewModel;
+import android.content.Context;
 
 import com.popular.movies.popularmovies.model.MovieListItem;
 
@@ -21,8 +22,12 @@ import io.reactivex.schedulers.Schedulers;
 
 public class MovieGridViewModel extends ViewModel {
 
-    private List<MovieListItem> getMovieListData(String movieString) {
+    private List<MovieListItem> getMovieListData(String movieString, Context context) {
         List<MovieListItem> movieList = new ArrayList<>();
+
+        if (movieString == null || movieString.isEmpty()) {
+            return null;
+        }
 
         try {
             JSONObject movieJson = new JSONObject(movieString);
@@ -47,8 +52,8 @@ public class MovieGridViewModel extends ViewModel {
         return movieList;
     }
 
-    public Single<List<MovieListItem>> getMovielist(String movieJson) {
-        return Single.fromCallable(() -> getMovieListData(movieJson))
+    public Single<List<MovieListItem>> getMovielist(String movieJson, Context context) {
+        return Single.fromCallable(() -> getMovieListData(movieJson, context))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
