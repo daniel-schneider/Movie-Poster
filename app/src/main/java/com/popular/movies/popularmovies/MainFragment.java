@@ -162,6 +162,16 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
         if (mListState != null) {
             mLayoutManager.onRestoreInstanceState(mListState);
         }
+
+        MovieGridViewModel movieGridViewModel = ViewModelProviders.of(this).get(MovieGridViewModel.class);
+
+        if (NetworkUtilities.isDeviceConnected(getContext())) {
+            if(mCurrentSort.equals(SORT_POPULAR)) {
+                movieGridViewModel.getMovielist(NetworkUtilities.getPopularMovies(), getContext());
+            } else {
+                movieGridViewModel.getMovielist(NetworkUtilities.getHighestRatedMovies(), getContext());
+            }
+        }
     }
 
     @Override
@@ -239,5 +249,11 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         checkConfig();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mCompositDisposable.dispose();
     }
 }

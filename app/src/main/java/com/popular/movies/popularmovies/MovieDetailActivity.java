@@ -3,6 +3,7 @@ package com.popular.movies.popularmovies;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -18,6 +19,7 @@ import com.popular.movies.popularmovies.utilities.ImageLoader;
 
 public class MovieDetailActivity extends Activity {
 
+    public static final String TAG = MovieDetailActivity.class.getSimpleName();
     public static final String EXTRA_MOVIE = "movie";
     public static final String EXTRA_MOVIE_BUNDLE_ITEM = "movieItem_bundle";
     Toolbar mToolbar;
@@ -55,7 +57,7 @@ public class MovieDetailActivity extends Activity {
             mMovieListItem = (MovieListItem) data.getParcelable(EXTRA_MOVIE);
         }
 
-
+        Log.i(TAG, mMovieListItem.getTitle() + "'s ID: " + mMovieListItem.getId());
         populateUi(mMovieListItem);
     }
 

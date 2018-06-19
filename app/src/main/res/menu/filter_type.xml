@@ -14,5 +14,9 @@
         android:title="Highest Rated"
         id:showAsAction="collapseActionView" />
 
+    <item
+        android:id="@+id/action_favorite"
+        android:title="Favorite"
+        id:showAsAction="collapseActionView" />
     </group>
 </menu>

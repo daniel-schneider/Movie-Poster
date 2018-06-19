@@ -71,6 +71,14 @@ public class NetworkUtilities extends ContextWrapper {
 
     }
 
+    public static void getMovieReviews() {
+
+    }
+
+    public static void getMovieTrailers() {
+
+    }
+
     private static class JsonTask extends AsyncTask<String, String, String> {
 
         protected void onPreExecute() {
@@ -141,12 +149,10 @@ public class NetworkUtilities extends ContextWrapper {
     }
 
     public static boolean isDeviceConnected(Context context) {
-        ConnectivityManager cm =
-                (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null &&
-                activeNetwork.isConnectedOrConnecting();
+        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
 
         return isConnected;
     }
