@@ -5,6 +5,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
+import com.popular.movies.popularmovies.data.Database;
+import com.popular.movies.popularmovies.data.DatabaseInitializer;
+import com.popular.movies.popularmovies.data.MovieDao;
+
 public class MainActivity extends AppCompatActivity {
 
 
@@ -12,6 +16,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        DatabaseInitializer.populateAsync(new Database() {
+            @Override
+            public MovieDao movieDao() {
+                return null;
+            }
+        });
 
         setContentView(R.layout.activity_main);
 

@@ -3,13 +3,17 @@ package com.popular.movies.popularmovies;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.support.v7.widget.Toolbar;
 
+import com.popular.movies.popularmovies.data.Database;
+import com.popular.movies.popularmovies.data.Movie;
 import com.popular.movies.popularmovies.model.MovieListItem;
 import com.popular.movies.popularmovies.utilities.ImageLoader;
 
@@ -59,6 +63,14 @@ public class MovieDetailActivity extends Activity {
 
         Log.i(TAG, mMovieListItem.getTitle() + "'s ID: " + mMovieListItem.getId());
         populateUi(mMovieListItem);
+
+        Button favoritesButton = findViewById(R.id.favorites_button);
+        favoritesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addMovieToDb(mMovieListItem);
+            }
+        });
     }
 
     private void populateUi(MovieListItem movieListItem) {
@@ -89,5 +101,13 @@ public class MovieDetailActivity extends Activity {
 
         outState.putParcelable(EXTRA_MOVIE_BUNDLE_ITEM, mMovieListItem);
 
+    }
+
+    private void addMovieToDb(MovieListItem movieListItem) {
+        Movie movie = new Movie(movieListItem.getId(), movieListItem.getTitle(), movieListItem.getVoteCount(),
+                movieListItem.getVoteAverage(), movieListItem.getVotePopularity(), movieListItem.getDetailImageUrl(),
+                movieListItem.getOverview(), movieListItem.getReleaseDate(), true);
+
+        Database.getAppDatabase(getApplicationContext()).movieDao().addMovie(movie);
     }
 }

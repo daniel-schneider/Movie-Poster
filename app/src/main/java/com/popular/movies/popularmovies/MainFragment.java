@@ -28,6 +28,7 @@ import io.reactivex.disposables.CompositeDisposable;
 
 public class MainFragment extends android.support.v4.app.Fragment implements MovieGridAdapter.ItemClickListener {
 
+    private static final String SORT_FAVORITE = "user_favorites";
     MovieGridAdapter mMovieGridAdapter;
     RecyclerView.LayoutManager mLayoutManager;
     RecyclerView mRecyclerView;
@@ -168,8 +169,10 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
         if (NetworkUtilities.isDeviceConnected(getContext())) {
             if(mCurrentSort.equals(SORT_POPULAR)) {
                 movieGridViewModel.getMovielist(NetworkUtilities.getPopularMovies(), getContext());
-            } else {
+            } else if(mCurrentSort.equals(SORT_TOP_RATED)) {
                 movieGridViewModel.getMovielist(NetworkUtilities.getHighestRatedMovies(), getContext());
+            } else if (mCurrentSort.equals((SORT_FAVORITE))) {
+                movieGridViewModel.getFavoriteslist(getContext());
             }
         }
     }
@@ -231,6 +234,32 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
 
             }));
         }
+
+
+//        TODO fix this if logic
+        if (id == R.id.action_favorite) {
+            mCurrentSort = SORT_FAVORITE;
+            mCompositDisposable.clear();
+            mCompositDisposable.add(movieGridViewModel.getFavoriteslist(getContext()).subscribe(movieListItems ->
+            {
+                if (mMovieGridAdapter != null) {
+                    mMovieGridAdapter.clearAllMovieData();
+                    mMovieGridAdapter.loadFavoriteMovies(movieListItems);
+                    mMovieGridAdapter.notifyDataSetChanged();
+                    mRecyclerView.setAdapter(mMovieGridAdapter);
+                } else {
+                    mMovieGridAdapter = new MovieGridAdapter(getActivity(), movieListItems);
+                    mMovieGridAdapter.setClickListener(this);
+                    mRecyclerView.setAdapter(mMovieGridAdapter);
+                    mMovieGridAdapter.notifyDataSetChanged();
+                }
+
+            }, throwable -> {
+                Toast.makeText(getContext(), "no internet connection", Toast.LENGTH_LONG).show();
+
+            }));
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -240,8 +269,10 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
         if (mCurrentSort.equals(SORT_TOP_RATED)) {
             menu.findItem(R.id.action_highest_rated).setChecked(true);
 
-        } else {
+        } else if (mCurrentSort.equals(SORT_POPULAR)) {
             menu.findItem(R.id.action_popular).setChecked(true);
+        } else if(mCurrentSort.equals(SORT_FAVORITE)) {
+            menu.findItem(R.id.action_favorite).setChecked(true);
         }
     }
 

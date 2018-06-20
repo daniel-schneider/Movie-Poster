@@ -33,6 +33,21 @@ import android.support.annotation.NonNull;
 @Entity(tableName = "movies")
 public class Movie {
 
+    public Movie (String movieId, String movieName, int voteCount, double voteAverage,
+                  double popularity, String posterPath,  String overview,
+                  String releaseDate, boolean favorited) {
+
+        this.movieId = movieId;
+        this.movieName = movieName;
+        this.voteCount = voteCount;
+        this.voteAverage = voteAverage;
+        this.popularity = popularity;
+        this.posterPath = posterPath;
+        this.overview = overview;
+        this.releaseDate = releaseDate;
+        this.favorited = favorited;
+    }
+
     @NonNull
     @PrimaryKey
     private String movieId;
@@ -41,13 +56,13 @@ public class Movie {
     private String movieName;
 
     @ColumnInfo(name = "vote_count")
-    private int voyeCount;
+    private int voteCount;
 
     @ColumnInfo(name = "vote_average")
-    private int votAverage;
+    private double voteAverage;
 
     @ColumnInfo(name = "popularity")
-    private long popularity;
+    private double popularity;
 
     @ColumnInfo(name = "poster_path")
     private String posterPath;
@@ -61,4 +76,76 @@ public class Movie {
     @ColumnInfo(name = "favorited")
     private boolean favorited;
 
+    public String getOverview() {
+        return overview;
+    }
+
+    public void setOverview(String overview) {
+        this.overview = overview;
+    }
+
+    @NonNull
+    public String getMovieId() {
+        return movieId;
+    }
+
+    public void setMovieId(@NonNull String movieId) {
+        this.movieId = movieId;
+    }
+
+    public String getMovieName() {
+        return movieName;
+    }
+
+    public void setMovieName(String movieName) {
+        this.movieName = movieName;
+    }
+
+    public int getVoteCount() {
+        return voteCount;
+    }
+
+    public void setVoteCount(int voteCount) {
+        this.voteCount = voteCount;
+    }
+
+    public double getVoteAverage() {
+        return voteAverage;
+    }
+
+    public void setVoteAverage(int voteAverage) {
+        this.voteAverage = voteAverage;
+    }
+
+    public double getPopularity() {
+        return popularity;
+    }
+
+    public void setPopularity(long popularity) {
+        this.popularity = popularity;
+    }
+
+    public String getPosterPath() {
+        return posterPath;
+    }
+
+    public void setPosterPath(String posterPath) {
+        this.posterPath = posterPath;
+    }
+
+    public String getReleaseDate() {
+        return releaseDate;
+    }
+
+    public void setReleaseDate(String releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
+    public boolean getFavorited() {
+        return favorited;
+    }
+
+    public void setFavorited(boolean favorited) {
+        this.favorited = favorited;
+    }
 }

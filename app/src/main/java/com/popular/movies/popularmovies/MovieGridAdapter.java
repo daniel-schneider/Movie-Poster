@@ -30,7 +30,6 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.View
         this.mInflater = LayoutInflater.from(context);
         this.mContext = context;
         this.mMovieList = movieListItems;
-
     }
 
     public MovieListItem getMovieListItemForPosition(int position) {
@@ -103,11 +102,10 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.View
     }
 
     public void loadHighestRatedMovies(List<MovieListItem> movieListItems) {
-
-
         mMovieList.addAll(movieListItems);
-//        String rawMovies = NetworkUtilities.getHighestRatedMovies();
-//        MovieGridViewModel viewModel = new MovieGridViewModel();
-//        viewModel.getMovielist(rawMovies);
+    }
+
+    public void loadFavoriteMovies(List<MovieListItem> movieListItems) {
+        mMovieList.addAll(movieListItems);
     }
 }

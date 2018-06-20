@@ -1,6 +1,7 @@
 package com.popular.movies.popularmovies.data;
 
 import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
@@ -15,9 +16,12 @@ public interface MovieDao {
     @Query("SELECT * FROM movies")
     List<Movie> getAll();
 
-    @Query("SELECT * FROM movies WHERE favorited = TRUE")
+    @Query("SELECT * FROM movies WHERE favorited = 1")
     List<Movie> getFavorites();
 
     @Update
     void updateMovie (Movie movie);
+
+    @Insert
+    void addMovie(Movie movie);
 }
