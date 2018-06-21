@@ -90,6 +90,10 @@ public class MovieListItem implements Parcelable {
         this.imageUrl = imageUrl;
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
     public String getTitle() {
         return title;
     }

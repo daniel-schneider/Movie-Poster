@@ -105,7 +105,7 @@ public class MovieDetailActivity extends Activity {
 
     private void addMovieToDb(MovieListItem movieListItem) {
         Movie movie = new Movie(movieListItem.getId(), movieListItem.getTitle(), movieListItem.getVoteCount(),
-                movieListItem.getVoteAverage(), movieListItem.getVotePopularity(), movieListItem.getDetailImageUrl(),
+                movieListItem.getVoteAverage(), movieListItem.getVotePopularity(), movieListItem.getImageUrl(),
                 movieListItem.getOverview(), movieListItem.getReleaseDate(), true);
 
         Database.getAppDatabase(getApplicationContext()).movieDao().addMovie(movie);

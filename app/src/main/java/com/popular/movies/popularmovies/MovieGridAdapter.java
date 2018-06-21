@@ -3,6 +3,7 @@ package com.popular.movies.popularmovies;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import java.util.List;
 
 public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.ViewHolder> {
 
+    private static final String TAG = MovieGridViewModel.class.getSimpleName();
     private Context mContext;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
@@ -47,6 +49,8 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.View
     public void onBindViewHolder(final ViewHolder holder, int position) {
         String title = mMovieList.get(position).getTitle();
         holder.title.setText(title);
+
+        Log.d(TAG, title + "'s image URL: " + mMovieList.get(position).getListImageUrl());
 
         ImageLoader.loadRoundedImage(mContext, mMovieList.get(position).getListImageUrl(), holder.MoviePosterImage);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -106,6 +110,10 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.View
     }
 
     public void loadFavoriteMovies(List<MovieListItem> movieListItems) {
+        for (MovieListItem item : movieListItems) {
+            Log.d(TAG, item.getTitle() + " loaded from db");
+
+        }
         mMovieList.addAll(movieListItems);
     }
 }
