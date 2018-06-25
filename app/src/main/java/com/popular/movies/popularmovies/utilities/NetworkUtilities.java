@@ -71,11 +71,21 @@ public class NetworkUtilities extends ContextWrapper {
 
     }
 
-    public static void getMovieReviews() {
+    public static String getMovieTrailors(String id) {
+        String trailorData = null;
 
+        try {
+            trailorData = new JsonTask().execute(BASE_URL + "/" + id + "/" + "videos?api_key=" + API_KEY + "&language=en-US").get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        return trailorData;
     }
 
-    public static void getMovieTrailers() {
+    public static void getMovieReviews() {
 
     }
 

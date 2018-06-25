@@ -65,7 +65,6 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.View
     @Override
     public int getItemCount() {
 
-        //TODO mMovieList is returning null. need to figure how to populate that list
         if (null == mMovieList) {
             return 0;
         }

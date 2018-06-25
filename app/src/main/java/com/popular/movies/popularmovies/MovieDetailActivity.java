@@ -1,8 +1,11 @@
 package com.popular.movies.popularmovies;
 
-import android.app.Activity;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -15,18 +18,28 @@ import android.widget.Toast;
 import com.popular.movies.popularmovies.data.Database;
 import com.popular.movies.popularmovies.data.Movie;
 import com.popular.movies.popularmovies.model.MovieListItem;
+import com.popular.movies.popularmovies.trailers.TrailersAdapter;
+import com.popular.movies.popularmovies.trailers.model.TrailerViewModel;
 import com.popular.movies.popularmovies.utilities.ImageLoader;
+import com.popular.movies.popularmovies.utilities.NetworkUtilities;
+
+import io.reactivex.disposables.CompositeDisposable;
 
 /**
  * Created by danielschneider on 5/7/18.
  */
 
-public class MovieDetailActivity extends Activity {
+public class MovieDetailActivity extends FragmentActivity implements TrailersAdapter.ItemClickListener {
 
     public static final String TAG = MovieDetailActivity.class.getSimpleName();
     public static final String EXTRA_MOVIE = "movie";
     public static final String EXTRA_MOVIE_BUNDLE_ITEM = "movieItem_bundle";
+    RecyclerView.LayoutManager mLayoutManager;
+    TrailersAdapter mTrailerAdapter;
+
     Toolbar mToolbar;
+    CompositeDisposable mCompositDisposable;
+    RecyclerView mTrailerRecyclerView;
 
 
 
@@ -88,6 +101,7 @@ public class MovieDetailActivity extends Activity {
         ratingBar.setRating(va);
         TextView descriptionText = findViewById(R.id.movie_description_tv);
         descriptionText.setText(movieListItem.getOverview());
+        createTrailerList();
     }
 
     private void closeOnError() {
@@ -109,5 +123,37 @@ public class MovieDetailActivity extends Activity {
                 movieListItem.getOverview(), movieListItem.getReleaseDate(), true);
 
         Database.getAppDatabase(getApplicationContext()).movieDao().addMovie(movie);
+    }
+
+    private void createTrailerList() {
+        mCompositDisposable = new CompositeDisposable();
+        String trailerString = NetworkUtilities.getMovieTrailors(mMovieListItem.getId());
+        mTrailerRecyclerView = findViewById(R.id.movie_trailors_recycler_view);
+        mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+
+
+        TrailerViewModel trailorViewModel = ViewModelProviders.of(this).get(TrailerViewModel.class);
+
+        if (NetworkUtilities.isDeviceConnected(this)) {
+            mCompositDisposable.add(trailorViewModel.getMovielist(trailerString).subscribe((trailorListItems -> {
+                mTrailerRecyclerView.setLayoutManager(mLayoutManager);
+                mTrailerAdapter = new TrailersAdapter(this, trailorListItems);
+                mTrailerAdapter.setClickListener(this);
+                mTrailerRecyclerView.setAdapter(mTrailerAdapter);
+
+            }), throwable -> {
+                Toast.makeText(this, "no internet connection", Toast.LENGTH_LONG).show();
+
+            }));
+        } else {
+            Toast.makeText(this, "no internet connection", Toast.LENGTH_LONG).show();
+        }
+
+
+    }
+
+    @Override
+    public void onItemClick(View view, int position) {
+
     }
 }
