@@ -2,4 +2,6 @@
     <string name="app_name">Popular Movies</string>
     <string name="error_message">Oopsie woopsie</string>
     <string name="add_to_favorites_btn_title">Add to Favorites</string>
+    <string name="play_trailer_btn">Play Trailer</string>
+    <string name="trailers_label">Trailers</string>
 </resources>

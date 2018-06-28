@@ -1,15 +1,19 @@
 package com.popular.movies.popularmovies.trailers;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.popular.movies.popularmovies.R;
 import com.popular.movies.popularmovies.trailers.model.TrailorListItem;
+import com.popular.movies.popularmovies.utilities.Utilities;
 
 import java.util.List;
 
@@ -65,16 +69,24 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.ViewHo
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private TextView title;
+        private Button playButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.review_title);
+            playButton = itemView.findViewById(R.id.play_trailor_btn);
+
+            playButton.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
             if (mClickListener != null) {
                 mClickListener.onItemClick(view, getAdapterPosition());
+            }
+
+            if (view.getId() == R.id.play_trailor_btn) {
+                onClickTrailor(mTrailorList.get(getAdapterPosition()).getKey());
             }
         }
     }
@@ -85,5 +97,17 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.ViewHo
 
     public interface ItemClickListener {
         void onItemClick(View view, int position);
+    }
+
+    private void onClickTrailor(String trailorId) {
+
+        Intent intent;
+
+        if (Utilities.isPackageInstalled("com.google.android.youtube", mContext)) {
+            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + trailorId));
+        } else {
+            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + trailorId));
+        }
+        mContext.startActivity(intent);
     }
 }
