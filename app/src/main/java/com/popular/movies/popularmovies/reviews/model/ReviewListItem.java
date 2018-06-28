@@ -1,4 +1,4 @@
-package com.popular.movies.popularmovies.model;
+package com.popular.movies.popularmovies.reviews.model;
 
 /**
  * Created by danielschneider on 6/18/18.
