@@ -19,6 +19,10 @@ public interface MovieDao {
     @Query("SELECT * FROM movies WHERE favorited = 1")
     List<Movie> getFavorites();
 
+    @Query("SELECT * FROM movies WHERE movieId = :id")
+    Movie getMovie(String id);
+
+
     @Update
     void updateMovie (Movie movie);
 

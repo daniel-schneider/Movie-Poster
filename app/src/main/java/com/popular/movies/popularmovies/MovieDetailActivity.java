@@ -18,10 +18,15 @@ import android.widget.Toast;
 import com.popular.movies.popularmovies.data.Database;
 import com.popular.movies.popularmovies.data.Movie;
 import com.popular.movies.popularmovies.model.MovieListItem;
+import com.popular.movies.popularmovies.reviews.ReviewsActivity;
 import com.popular.movies.popularmovies.trailers.TrailersAdapter;
 import com.popular.movies.popularmovies.trailers.model.TrailerViewModel;
 import com.popular.movies.popularmovies.utilities.ImageLoader;
 import com.popular.movies.popularmovies.utilities.NetworkUtilities;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import io.reactivex.disposables.CompositeDisposable;
 
@@ -41,9 +46,8 @@ public class MovieDetailActivity extends FragmentActivity implements TrailersAda
     CompositeDisposable mCompositDisposable;
     RecyclerView mTrailerRecyclerView;
 
-
-
     private MovieListItem mMovieListItem;
+    private boolean mFavorited = false;
 
     public MovieDetailActivity() {
 
@@ -81,9 +85,31 @@ public class MovieDetailActivity extends FragmentActivity implements TrailersAda
         favoritesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addMovieToDb(mMovieListItem);
+                if(mFavorited) {
+                    removeMovieFormFavortites();
+                    favoritesButton.setText("add to favorites");
+
+                } else {
+                    addMovieToDb(mMovieListItem);
+                    favoritesButton.setText("Remove from favorites");
+                }
             }
         });
+
+        Button reviewButton = findViewById(R.id.reviews_button);
+
+        if(hasReviews()) {
+            reviewButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(MovieDetailActivity.this, ReviewsActivity.class);
+                    intent.putExtra(ReviewsActivity.EXTRA_MOVIE, mMovieListItem);
+                    startActivity(intent);
+                }
+            });
+        } else {
+            reviewButton.setVisibility(View.GONE);
+        }
     }
 
     private void populateUi(MovieListItem movieListItem) {
@@ -125,6 +151,14 @@ public class MovieDetailActivity extends FragmentActivity implements TrailersAda
         Database.getAppDatabase(getApplicationContext()).movieDao().addMovie(movie);
     }
 
+    private void removeMovieFormFavortites() {
+        Database db = Database.getAppDatabase(this);
+
+        Movie movie = db.movieDao().getMovie(mMovieListItem.getId());
+        movie.setFavorited(false);
+        db.movieDao().updateMovie(movie);
+    }
+
     private void createTrailerList() {
         mCompositDisposable = new CompositeDisposable();
         String trailerString = NetworkUtilities.getMovieTrailors(mMovieListItem.getId());
@@ -148,12 +182,27 @@ public class MovieDetailActivity extends FragmentActivity implements TrailersAda
         } else {
             Toast.makeText(this, "no internet connection", Toast.LENGTH_LONG).show();
         }
-
-
     }
 
     @Override
     public void onItemClick(View view, int position) {
 
+    }
+
+    private boolean hasReviews() {
+        String reviewString = NetworkUtilities.getMovieReview(mMovieListItem.getId());
+        try {
+            JSONObject json = new JSONObject(reviewString);
+            JSONArray results = json.getJSONArray("results");
+
+            if(results.length() == 0) {
+                return false;
+            } else {
+                return true;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

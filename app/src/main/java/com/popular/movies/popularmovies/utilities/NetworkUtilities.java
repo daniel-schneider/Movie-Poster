@@ -75,7 +75,7 @@ public class NetworkUtilities extends ContextWrapper {
         String trailorData = null;
 
         try {
-            trailorData = new JsonTask().execute(BASE_URL + "/" + id + "/" + "videos?api_key=" + API_KEY + "&language=en-US").get();
+            trailorData = new JsonTask().execute(BASE_URL + "/" + id + "/videos?api_key=" + API_KEY + "&language=en-US").get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -83,6 +83,19 @@ public class NetworkUtilities extends ContextWrapper {
         }
 
         return trailorData;
+    }
+
+    public static String getMovieReview(String id) {
+        String reviewData = null;
+
+        try {
+            reviewData = new JsonTask().execute(BASE_URL + "/" + id + "/reviews?api_key=" + API_KEY + "&language=en-US").get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        return reviewData;
     }
 
     public static void getMovieReviews() {
