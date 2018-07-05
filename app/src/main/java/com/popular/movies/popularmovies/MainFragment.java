@@ -37,7 +37,7 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
     ProgressBar mProgressBar = null;
     private static final String SORT_POPULAR = "popular";
     private static final String SORT_TOP_RATED = "top_rated";
-    private static String mCurrentSort = SORT_POPULAR;
+    private static String mCurrentSort;
     private static final String CURRENT_SORT_KEY = "CURRENT_SORT_KEY";
 
 
@@ -58,6 +58,8 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
             if(savedInstanceState.containsKey(CURRENT_SORT_KEY)) {
                 mCurrentSort = savedInstanceState.getString(CURRENT_SORT_KEY, SORT_POPULAR);
             }
+        } else {
+            mCurrentSort = SORT_POPULAR;
         }
     }
 
@@ -164,6 +166,7 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
             mLayoutManager.onRestoreInstanceState(mListState);
         }
 
+
         MovieGridViewModel movieGridViewModel = ViewModelProviders.of(this).get(MovieGridViewModel.class);
 
         if (NetworkUtilities.isDeviceConnected(getContext())) {
@@ -172,7 +175,8 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
             } else if(mCurrentSort.equals(SORT_TOP_RATED)) {
                 movieGridViewModel.getMovielist(NetworkUtilities.getHighestRatedMovies(), getContext());
             } else if (mCurrentSort.equals((SORT_FAVORITE))) {
-                movieGridViewModel.getFavoriteslist(getContext());
+                movieGridViewModel.getFavoritesFromDb(getContext());
+                mMovieGridAdapter.notifyDataSetChanged();
             }
         }
     }

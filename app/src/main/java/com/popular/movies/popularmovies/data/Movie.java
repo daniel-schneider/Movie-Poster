@@ -5,6 +5,8 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
+import com.popular.movies.popularmovies.model.MovieListItem;
+
 /**
  * Created by danielschneider on 6/19/18.
  */
@@ -46,6 +48,18 @@ public class Movie {
         this.overview = overview;
         this.releaseDate = releaseDate;
         this.favorited = favorited;
+    }
+
+    public Movie (MovieListItem movieListItem) {
+        this.movieId = movieListItem.getId();
+        this.movieName = movieListItem.getTitle();
+        this.voteCount = movieListItem.getVoteCount();
+        this.voteAverage = movieListItem.getVoteAverage();
+        this.popularity = movieListItem.getVotePopularity();
+        this.posterPath = movieListItem.getImageUrl();
+        this.overview = movieListItem.getOverview();
+        this.releaseDate = movieListItem.getReleaseDate();
+        this.favorited = false;
     }
 
     @NonNull

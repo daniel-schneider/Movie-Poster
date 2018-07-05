@@ -81,18 +81,27 @@ public class MovieDetailActivity extends FragmentActivity implements TrailersAda
         Log.i(TAG, mMovieListItem.getTitle() + "'s ID: " + mMovieListItem.getId());
         populateUi(mMovieListItem);
 
+        Database db = Database.getAppDatabase(this);
+        if(db.movieDao().getMovie((mMovieListItem.getId())) == null) {
+            Movie movie = new Movie(mMovieListItem);
+            db.movieDao().addMovie(movie);
+        } else {
+            mFavorited = db.movieDao().getMovie(mMovieListItem.getId()).getFavorited();
+        }
+
         Button favoritesButton = findViewById(R.id.favorites_button);
+        setFavoriteButtonText(favoritesButton);
         favoritesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(mFavorited) {
                     removeMovieFormFavortites();
-                    favoritesButton.setText("add to favorites");
-
+                    mFavorited = false;
                 } else {
                     addMovieToDb(mMovieListItem);
-                    favoritesButton.setText("Remove from favorites");
+                    mFavorited = true;
                 }
+                setFavoriteButtonText(favoritesButton);
             }
         });
 
@@ -203,6 +212,14 @@ public class MovieDetailActivity extends FragmentActivity implements TrailersAda
         } catch (JSONException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    private void setFavoriteButtonText(Button favoriteButton) {
+        if(mFavorited) {
+            favoriteButton.setText("remove from favorites");
+        } else {
+            favoriteButton.setText("add to favorites");
         }
     }
 }

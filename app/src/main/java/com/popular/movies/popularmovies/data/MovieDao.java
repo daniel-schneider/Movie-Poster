@@ -7,6 +7,8 @@ import android.arch.persistence.room.Update;
 
 import java.util.List;
 
+import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
+
 /**
  * Created by danielschneider on 6/19/18.
  */
@@ -26,6 +28,7 @@ public interface MovieDao {
     @Update
     void updateMovie (Movie movie);
 
-    @Insert
+
+    @Insert(onConflict = REPLACE)
     void addMovie(Movie movie);
 }

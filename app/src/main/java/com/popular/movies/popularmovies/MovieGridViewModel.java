@@ -66,8 +66,8 @@ public class MovieGridViewModel extends ViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    private List<MovieListItem> getFavoritesFromDb(Context context) {
-        List<Movie> favoriteMovies = Database.getAppDatabase(context).movieDao().getAll();
+    public List<MovieListItem> getFavoritesFromDb(Context context) {
+        List<Movie> favoriteMovies = Database.getAppDatabase(context).movieDao().getFavorites();
         List<MovieListItem> favoriteList = new ArrayList<>();
 
         for(int i = 0; i < favoriteMovies.size(); i++) {
