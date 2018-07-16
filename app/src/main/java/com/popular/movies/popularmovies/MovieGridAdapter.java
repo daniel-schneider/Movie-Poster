@@ -83,6 +83,7 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.View
 
     public void setFavorites(List<Movie> favorites) {
         mFavorites = favorites;
+        mMovieList.clear();
         loadFavoriteMovies(favorites);
         notifyDataSetChanged();
     }

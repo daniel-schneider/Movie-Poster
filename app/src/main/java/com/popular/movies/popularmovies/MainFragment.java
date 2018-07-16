@@ -251,29 +251,11 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
             movieGridViewModel.getFavoritesFromDb(getActivity()).observe(this, new Observer<List<Movie>>() {
                 @Override
                 public void onChanged(@Nullable List<Movie> movies) {
-                    mMovieGridAdapter.setFavorites(movies);
+                    if (mCurrentSort.equals(SORT_FAVORITE)) {
+                        mMovieGridAdapter.setFavorites(movies);
+                    }
                 }
             });
-
-//            mCompositDisposable.clear();
-//            mCompositDisposable.add(movieGridViewModel.getFavoriteslist(getContext()).subscribe(movieListItems ->
-//            {
-//                if (mMovieGridAdapter != null) {
-//                    mMovieGridAdapter.clearAllMovieData();
-//                    mMovieGridAdapter.loadFavoriteMovies(movieListItems);
-//                    mMovieGridAdapter.notifyDataSetChanged();
-//                    mRecyclerView.setAdapter(mMovieGridAdapter);
-//                } else {
-//                    mMovieGridAdapter = new MovieGridAdapter(getActivity(), movieListItems);
-//                    mMovieGridAdapter.setClickListener(this);
-//                    mRecyclerView.setAdapter(mMovieGridAdapter);
-//                    mMovieGridAdapter.notifyDataSetChanged();
-//                }
-//
-//            }, throwable -> {
-//                Toast.makeText(getContext(), "no internet connection", Toast.LENGTH_LONG).show();
-//
-//            }));
         }
 
         return super.onOptionsItemSelected(item);
