@@ -10,9 +10,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.popular.movies.popularmovies.data.Movie;
 import com.popular.movies.popularmovies.model.MovieListItem;
 import com.popular.movies.popularmovies.utilities.ImageLoader;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,6 +28,7 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.View
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
     private List<MovieListItem> mMovieList;
+    private List<Movie> mFavorites;
 
 
     MovieGridAdapter(Context context, List<MovieListItem> movieListItems) {
@@ -60,6 +63,8 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.View
             }
         });
 
+
+
     }
 
     @Override
@@ -70,6 +75,16 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.View
         }
 
         return mMovieList.size();
+    }
+
+    public List<Movie> getFavorites() {
+        return mFavorites;
+    }
+
+    public void setFavorites(List<Movie> favorites) {
+        mFavorites = favorites;
+        loadFavoriteMovies(favorites);
+        notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -108,11 +123,31 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.View
         mMovieList.addAll(movieListItems);
     }
 
-    public void loadFavoriteMovies(List<MovieListItem> movieListItems) {
-        for (MovieListItem item : movieListItems) {
+    public void loadFavoriteMovies(List<Movie> movieList) {
+
+        List<Movie> favoriteMovies = movieList;
+        List<MovieListItem> favoriteList = new ArrayList<>();
+
+        for(int i = 0; i < favoriteMovies.size(); i++) {
+            MovieListItem favoriteListItem = new MovieListItem();
+            Movie movieObject = favoriteMovies.get(i);
+
+            favoriteListItem.setId(movieObject.getMovieId());
+            favoriteListItem.setImageUrl(movieObject.getPosterPath());
+            favoriteListItem.setTitle(movieObject.getMovieName());
+            favoriteListItem.setVoteCount(movieObject.getVoteCount());
+            favoriteListItem.setVoteAverage(movieObject.getVoteAverage());
+            favoriteListItem.setVotePopularity(movieObject.getPopularity());
+            favoriteListItem.setOverview(movieObject.getOverview());
+            favoriteListItem.setReleaseDate(movieObject.getReleaseDate());
+            favoriteList.add(favoriteListItem);
+        }
+
+
+        for (MovieListItem item : favoriteList) {
             Log.d(TAG, item.getTitle() + " loaded from db");
 
         }
-        mMovieList.addAll(movieListItems);
+        mMovieList.addAll(favoriteList);
     }
 }

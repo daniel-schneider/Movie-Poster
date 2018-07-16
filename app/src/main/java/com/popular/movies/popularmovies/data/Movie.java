@@ -50,7 +50,7 @@ public class Movie {
         this.favorited = favorited;
     }
 
-    public Movie (MovieListItem movieListItem) {
+    public Movie (MovieListItem movieListItem, boolean favorited) {
         this.movieId = movieListItem.getId();
         this.movieName = movieListItem.getTitle();
         this.voteCount = movieListItem.getVoteCount();
@@ -59,7 +59,7 @@ public class Movie {
         this.posterPath = movieListItem.getImageUrl();
         this.overview = movieListItem.getOverview();
         this.releaseDate = movieListItem.getReleaseDate();
-        this.favorited = false;
+        this.favorited = favorited;
     }
 
     @NonNull

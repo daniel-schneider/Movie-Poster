@@ -1,5 +1,6 @@
 package com.popular.movies.popularmovies;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 
@@ -60,30 +61,30 @@ public class MovieGridViewModel extends ViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Single<List<MovieListItem>> getFavoriteslist(Context context) {
-        return Single.fromCallable(() -> getFavoritesFromDb(context))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-    }
+//    public Single<LiveData<List<MovieListItem>>> getFavoriteslist(Context context) {
+//        return Single.fromCallable(() -> getFavoritesFromDb(context))
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread());
+//    }
 
-    public List<MovieListItem> getFavoritesFromDb(Context context) {
-        List<Movie> favoriteMovies = Database.getAppDatabase(context).movieDao().getFavorites();
-        List<MovieListItem> favoriteList = new ArrayList<>();
-
-        for(int i = 0; i < favoriteMovies.size(); i++) {
-            MovieListItem favoriteListItem = new MovieListItem();
-            Movie movieObject = favoriteMovies.get(i);
-
-            favoriteListItem.setId(movieObject.getMovieId());
-            favoriteListItem.setImageUrl(movieObject.getPosterPath());
-            favoriteListItem.setTitle(movieObject.getMovieName());
-            favoriteListItem.setVoteCount(movieObject.getVoteCount());
-            favoriteListItem.setVoteAverage(movieObject.getVoteAverage());
-            favoriteListItem.setVotePopularity(movieObject.getPopularity());
-            favoriteListItem.setOverview(movieObject.getOverview());
-            favoriteListItem.setReleaseDate(movieObject.getReleaseDate());
-            favoriteList.add(favoriteListItem);
-        }
-        return favoriteList;
+    public LiveData<List<Movie>> getFavoritesFromDb(Context context) {
+        LiveData<List<Movie>> favoriteMovies = Database.getAppDatabase(context).movieDao().getFavorites();
+//        LiveData<List<MovieListItem>> favoriteList = new ArrayList<>();
+//
+//        for(int i = 0; i < favoriteMovies.size(); i++) {
+//            MovieListItem favoriteListItem = new MovieListItem();
+//            Movie movieObject = favoriteMovies.get(i);
+//
+//            favoriteListItem.setId(movieObject.getMovieId());
+//            favoriteListItem.setImageUrl(movieObject.getPosterPath());
+//            favoriteListItem.setTitle(movieObject.getMovieName());
+//            favoriteListItem.setVoteCount(movieObject.getVoteCount());
+//            favoriteListItem.setVoteAverage(movieObject.getVoteAverage());
+//            favoriteListItem.setVotePopularity(movieObject.getPopularity());
+//            favoriteListItem.setOverview(movieObject.getOverview());
+//            favoriteListItem.setReleaseDate(movieObject.getReleaseDate());
+//            favoriteList.getValue().add(favoriteListItem);
+//        }
+        return favoriteMovies;
     }
 }

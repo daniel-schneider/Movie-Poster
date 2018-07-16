@@ -1,8 +1,11 @@
 package com.popular.movies.popularmovies;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -39,6 +42,9 @@ public class MovieDetailActivity extends FragmentActivity implements TrailersAda
     public static final String TAG = MovieDetailActivity.class.getSimpleName();
     public static final String EXTRA_MOVIE = "movie";
     public static final String EXTRA_MOVIE_BUNDLE_ITEM = "movieItem_bundle";
+    private static final String DEFAULT_MOVIE_ID = "default";
+    private String mMovieId = DEFAULT_MOVIE_ID;
+
     RecyclerView.LayoutManager mLayoutManager;
     TrailersAdapter mTrailerAdapter;
 
@@ -47,7 +53,9 @@ public class MovieDetailActivity extends FragmentActivity implements TrailersAda
     RecyclerView mTrailerRecyclerView;
 
     private MovieListItem mMovieListItem;
+    private Movie mMovie;
     private boolean mFavorited = false;
+    Database mDb;
 
     public MovieDetailActivity() {
 
@@ -63,6 +71,9 @@ public class MovieDetailActivity extends FragmentActivity implements TrailersAda
         super.onCreate(savedInstanceState);
         setContentView(R.layout.movie_detail);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        mDb = Database.getAppDatabase(this);
+
         Intent intent = getIntent();
         if (intent == null) {
             closeOnError();
@@ -70,44 +81,41 @@ public class MovieDetailActivity extends FragmentActivity implements TrailersAda
 
         Bundle data = getIntent().getExtras();
 
-        if(savedInstanceState != null) {
-            if(savedInstanceState.containsKey(EXTRA_MOVIE_BUNDLE_ITEM)) {
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(EXTRA_MOVIE_BUNDLE_ITEM)) {
                 mMovieListItem = (MovieListItem) savedInstanceState.getParcelable(EXTRA_MOVIE_BUNDLE_ITEM);
             }
         } else {
             mMovieListItem = (MovieListItem) data.getParcelable(EXTRA_MOVIE);
         }
 
+        setupViewModel();
+
+        if (!isMovieInDb()) {
+            mMovie = new Movie(mMovieListItem, false);
+            addMovieToDb(mMovie, mFavorited);
+            mFavorited = mMovie.getFavorited();
+        } else {
+            mMovie = mDb.movieDao().getMovieObject(mMovieListItem.getId());
+            mFavorited = mMovie.getFavorited();
+        }
+
         Log.i(TAG, mMovieListItem.getTitle() + "'s ID: " + mMovieListItem.getId());
         populateUi(mMovieListItem);
-
-        Database db = Database.getAppDatabase(this);
-        if(db.movieDao().getMovie((mMovieListItem.getId())) == null) {
-            Movie movie = new Movie(mMovieListItem);
-            db.movieDao().addMovie(movie);
-        } else {
-            mFavorited = db.movieDao().getMovie(mMovieListItem.getId()).getFavorited();
-        }
 
         Button favoritesButton = findViewById(R.id.favorites_button);
         setFavoriteButtonText(favoritesButton);
         favoritesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(mFavorited) {
-                    removeMovieFormFavortites();
-                    mFavorited = false;
-                } else {
-                    addMovieToDb(mMovieListItem);
-                    mFavorited = true;
-                }
+                onSaveButtonClicked();
                 setFavoriteButtonText(favoritesButton);
             }
         });
 
         Button reviewButton = findViewById(R.id.reviews_button);
 
-        if(hasReviews()) {
+        if (hasReviews()) {
             reviewButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -119,6 +127,27 @@ public class MovieDetailActivity extends FragmentActivity implements TrailersAda
         } else {
             reviewButton.setVisibility(View.GONE);
         }
+        setFavoriteButtonText(favoritesButton);
+
+
+    }
+
+    private ViewModel setupViewModel() {
+        MovieDetailViewModelFactory factory = new MovieDetailViewModelFactory(mDb, mMovieListItem.getId());
+        final MovieDetailViewModel viewModel = ViewModelProviders.of(this, factory).get(MovieDetailViewModel.class);
+        viewModel.getMovie().observe(this, new Observer<Movie>() {
+            @Override
+            public void onChanged(@Nullable Movie movie) {
+                if (mFavorited) {
+                    updateMovie(movie, mFavorited);
+                    mFavorited = movie.getFavorited();
+                } else {
+                    updateMovie(movie, false);
+                }
+                viewModel.getMovie().removeObserver(this);
+            }
+        });
+        return viewModel;
     }
 
     private void populateUi(MovieListItem movieListItem) {
@@ -152,20 +181,30 @@ public class MovieDetailActivity extends FragmentActivity implements TrailersAda
 
     }
 
-    private void addMovieToDb(MovieListItem movieListItem) {
+    private void addMovieToDb(MovieListItem movieListItem, boolean favorited) {
         Movie movie = new Movie(movieListItem.getId(), movieListItem.getTitle(), movieListItem.getVoteCount(),
                 movieListItem.getVoteAverage(), movieListItem.getVotePopularity(), movieListItem.getImageUrl(),
-                movieListItem.getOverview(), movieListItem.getReleaseDate(), true);
+                movieListItem.getOverview(), movieListItem.getReleaseDate(), favorited);
 
-        Database.getAppDatabase(getApplicationContext()).movieDao().addMovie(movie);
+        mDb.movieDao().addMovie(movie);
     }
 
-    private void removeMovieFormFavortites() {
-        Database db = Database.getAppDatabase(this);
+    private void addMovieToDb(Movie movie, boolean favorited) {
+        movie.setFavorited(favorited);
+        mDb.movieDao().addMovie(movie);
+    }
 
-        Movie movie = db.movieDao().getMovie(mMovieListItem.getId());
-        movie.setFavorited(false);
-        db.movieDao().updateMovie(movie);
+    private void updateMovie(Movie movie, boolean favorited) {
+        movie.setFavorited(favorited);
+        mDb.movieDao().updateMovie(movie);
+    }
+
+    private void removeMovieFromFavortites() {
+
+        mMovie.setFavorited(false);
+//        movie.setFavorited(false);
+        mDb.movieDao().updateMovie(mMovie);
+        mFavorited = false;
     }
 
     private void createTrailerList() {
@@ -204,7 +243,7 @@ public class MovieDetailActivity extends FragmentActivity implements TrailersAda
             JSONObject json = new JSONObject(reviewString);
             JSONArray results = json.getJSONArray("results");
 
-            if(results.length() == 0) {
+            if (results.length() == 0) {
                 return false;
             } else {
                 return true;
@@ -216,10 +255,24 @@ public class MovieDetailActivity extends FragmentActivity implements TrailersAda
     }
 
     private void setFavoriteButtonText(Button favoriteButton) {
-        if(mFavorited) {
+        if (mFavorited) {
             favoriteButton.setText("remove from favorites");
         } else {
             favoriteButton.setText("add to favorites");
+        }
+    }
+
+    private boolean isMovieInDb() {
+        return  mDb.movieDao().getMovieObject(mMovieListItem.getId()) != null;
+    }
+
+    private void onSaveButtonClicked() {
+        if (mFavorited) {
+            mFavorited = false;
+            updateMovie(mMovie, mFavorited);
+        } else {
+            mFavorited = true;
+            updateMovie(mMovie ,mFavorited);
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.popular.movies.popularmovies;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -18,7 +19,10 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.popular.movies.popularmovies.data.Movie;
 import com.popular.movies.popularmovies.utilities.NetworkUtilities;
+
+import java.util.List;
 
 import io.reactivex.disposables.CompositeDisposable;
 
@@ -243,25 +247,33 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
 //        TODO fix this if logic
         if (id == R.id.action_favorite) {
             mCurrentSort = SORT_FAVORITE;
-            mCompositDisposable.clear();
-            mCompositDisposable.add(movieGridViewModel.getFavoriteslist(getContext()).subscribe(movieListItems ->
-            {
-                if (mMovieGridAdapter != null) {
-                    mMovieGridAdapter.clearAllMovieData();
-                    mMovieGridAdapter.loadFavoriteMovies(movieListItems);
-                    mMovieGridAdapter.notifyDataSetChanged();
-                    mRecyclerView.setAdapter(mMovieGridAdapter);
-                } else {
-                    mMovieGridAdapter = new MovieGridAdapter(getActivity(), movieListItems);
-                    mMovieGridAdapter.setClickListener(this);
-                    mRecyclerView.setAdapter(mMovieGridAdapter);
-                    mMovieGridAdapter.notifyDataSetChanged();
+            mMovieGridAdapter.clearAllMovieData();
+            movieGridViewModel.getFavoritesFromDb(getActivity()).observe(this, new Observer<List<Movie>>() {
+                @Override
+                public void onChanged(@Nullable List<Movie> movies) {
+                    mMovieGridAdapter.setFavorites(movies);
                 }
+            });
 
-            }, throwable -> {
-                Toast.makeText(getContext(), "no internet connection", Toast.LENGTH_LONG).show();
-
-            }));
+//            mCompositDisposable.clear();
+//            mCompositDisposable.add(movieGridViewModel.getFavoriteslist(getContext()).subscribe(movieListItems ->
+//            {
+//                if (mMovieGridAdapter != null) {
+//                    mMovieGridAdapter.clearAllMovieData();
+//                    mMovieGridAdapter.loadFavoriteMovies(movieListItems);
+//                    mMovieGridAdapter.notifyDataSetChanged();
+//                    mRecyclerView.setAdapter(mMovieGridAdapter);
+//                } else {
+//                    mMovieGridAdapter = new MovieGridAdapter(getActivity(), movieListItems);
+//                    mMovieGridAdapter.setClickListener(this);
+//                    mRecyclerView.setAdapter(mMovieGridAdapter);
+//                    mMovieGridAdapter.notifyDataSetChanged();
+//                }
+//
+//            }, throwable -> {
+//                Toast.makeText(getContext(), "no internet connection", Toast.LENGTH_LONG).show();
+//
+//            }));
         }
 
         return super.onOptionsItemSelected(item);
