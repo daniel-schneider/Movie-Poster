@@ -37,12 +37,15 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
     RecyclerView.LayoutManager mLayoutManager;
     RecyclerView mRecyclerView;
     private CompositeDisposable mCompositDisposable;
-    private Parcelable mListState = null;
+    public Parcelable mListState = null;
     ProgressBar mProgressBar = null;
     private static final String SORT_POPULAR = "popular";
     private static final String SORT_TOP_RATED = "top_rated";
     private static String mCurrentSort;
     private static final String CURRENT_SORT_KEY = "CURRENT_SORT_KEY";
+    int mLastFirstVisiblePosition;
+    private static final String FIRST_VISIBLE_POSITION_KEY = "FIRST_VISIBLE_POSITION_KEY";
+
 
 
     public final static String TAG = MainFragment.class.getSimpleName();
@@ -61,6 +64,7 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
             }
             if(savedInstanceState.containsKey(CURRENT_SORT_KEY)) {
                 mCurrentSort = savedInstanceState.getString(CURRENT_SORT_KEY, SORT_POPULAR);
+
             }
         } else {
             mCurrentSort = SORT_POPULAR;
@@ -77,6 +81,11 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
         if(savedInstanceState != null) {
             if(savedInstanceState.containsKey(LIST_STATE_KEY)) {
                 mLayoutManager.onRestoreInstanceState(mListState);
+            }
+            if(savedInstanceState.containsKey(FIRST_VISIBLE_POSITION_KEY)) {
+                mLastFirstVisiblePosition = savedInstanceState.getInt(FIRST_VISIBLE_POSITION_KEY);
+                mRecyclerView.getLayoutManager().scrollToPosition(mLastFirstVisiblePosition);
+
             }
         }
 
@@ -123,12 +132,17 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
+        outState.putInt(FIRST_VISIBLE_POSITION_KEY, mLastFirstVisiblePosition);
+
+
         if (mListState != null) {
             mListState = mRecyclerView.getLayoutManager().onSaveInstanceState();
             outState.putParcelable(LIST_STATE_KEY, mListState);
             outState.putString(CURRENT_SORT_KEY, mCurrentSort);
         }
     }
+
+
 
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
@@ -138,6 +152,17 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
             mCurrentSort = savedInstanceState.getString(CURRENT_SORT_KEY);
         }
     }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        // Retrieve list state and list/item positions
+        if(savedInstanceState != null) {
+            mListState = savedInstanceState.getParcelable(LIST_STATE_KEY);
+            mLayoutManager.onRestoreInstanceState(mListState);
+        }
+    }
+
 
     private void checkConfig() {
         if(getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
@@ -150,11 +175,18 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
         if(mRecyclerView != null) {
             mRecyclerView.setLayoutManager(mLayoutManager);
         }
+
+        if (mListState != null) {
+            mLayoutManager.onRestoreInstanceState(mListState);
+            mRecyclerView.getLayoutManager().scrollToPosition(mLastFirstVisiblePosition);
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        mLastFirstVisiblePosition =  ((GridLayoutManager)mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+
 
         Bundle bundle = new Bundle();
         if (mListState != null) {
@@ -168,8 +200,9 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
         super.onResume();
         if (mListState != null) {
             mLayoutManager.onRestoreInstanceState(mListState);
-        }
+            mRecyclerView.getLayoutManager().scrollToPosition(mLastFirstVisiblePosition);
 
+        }
 
         MovieGridViewModel movieGridViewModel = ViewModelProviders.of(this).get(MovieGridViewModel.class);
 
@@ -244,7 +277,6 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
         }
 
 
-//        TODO fix this if logic
         if (id == R.id.action_favorite) {
             mCurrentSort = SORT_FAVORITE;
             mMovieGridAdapter.clearAllMovieData();
