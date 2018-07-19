@@ -74,9 +74,13 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mCompositDisposable = new CompositeDisposable();
+
+        mRecyclerView = view.findViewById(R.id.movie_posters_recycler_view);
+        mMovieGridAdapter = new MovieGridAdapter(getActivity(), null);
+        mRecyclerView.setAdapter(mMovieGridAdapter);
         checkConfig();
 
+        mCompositDisposable = new CompositeDisposable();
 
         if(savedInstanceState != null) {
             if(savedInstanceState.containsKey(LIST_STATE_KEY)) {
@@ -89,20 +93,15 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
             }
         }
 
-        mProgressBar = view.findViewById(R.id.main_progress_bar);
-        mRecyclerView = view.findViewById(R.id.movie_posters_recycler_view);
         String movieJsonString = NetworkUtilities.getPopularMovies();
-
 
         MovieGridViewModel movieGridViewModel = ViewModelProviders.of(this).get(MovieGridViewModel.class);
 
         if (NetworkUtilities.isDeviceConnected(getContext())) {
             mCompositDisposable.add(movieGridViewModel.getMovielist(movieJsonString, getContext()).subscribe((movieListItems -> {
-                mProgressBar.setVisibility(View.GONE);
-                mRecyclerView.setLayoutManager(mLayoutManager);
-                mMovieGridAdapter = new MovieGridAdapter(getActivity(), movieListItems);
+                mMovieGridAdapter.loadMovies(movieListItems);
+                mMovieGridAdapter.notifyDataSetChanged();
                 mMovieGridAdapter.setClickListener(this);
-                mRecyclerView.setAdapter(mMovieGridAdapter);
 
             }), throwable -> {
                 Toast.makeText(getContext(), "no internet connection", Toast.LENGTH_LONG).show();
@@ -135,7 +134,7 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
         outState.putInt(FIRST_VISIBLE_POSITION_KEY, mLastFirstVisiblePosition);
 
 
-        if (mListState != null) {
+        if (mListState == null) {
             mListState = mRecyclerView.getLayoutManager().onSaveInstanceState();
             outState.putParcelable(LIST_STATE_KEY, mListState);
             outState.putString(CURRENT_SORT_KEY, mCurrentSort);
@@ -185,7 +184,7 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
     @Override
     public void onPause() {
         super.onPause();
-        mLastFirstVisiblePosition =  ((GridLayoutManager)mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+        mLastFirstVisiblePosition =  ((GridLayoutManager)mRecyclerView.getLayoutManager()).findFirstVisibleItemPosition();
 
 
         Bundle bundle = new Bundle();
@@ -309,6 +308,16 @@ public class MainFragment extends android.support.v4.app.Fragment implements Mov
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+
+        mLastFirstVisiblePosition =  ((GridLayoutManager)mRecyclerView.getLayoutManager()).findFirstVisibleItemPosition();
+
+
+        Bundle bundle = new Bundle();
+        if (mListState == null) {
+            mListState = mRecyclerView.getLayoutManager().onSaveInstanceState();
+            bundle.putParcelable(LIST_STATE_KEY, mListState);
+        }
+
         checkConfig();
     }
 

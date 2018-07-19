@@ -124,6 +124,10 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.View
         mMovieList.addAll(movieListItems);
     }
 
+    public void loadMovies(List<MovieListItem> movieListItems) {
+        mMovieList = movieListItems;
+    }
+
     public void loadFavoriteMovies(List<Movie> movieList) {
 
         List<Movie> favoriteMovies = movieList;
